@@ -1,0 +1,35 @@
+- name: Linux | Configure system with Insights
+  hosts: "{{ target_hosts | default('rhel_demo_servers', true) }}"
+  become: true
+  tasks:
+    - name: Linux | Configure tags
+      when:
+        - insights_tags is defined
+        - insights_tags | length > 0
+      block:
+        - name: Linux | Additional tags to add
+          ansible.builtin.file:
+            path: /etc/insights-client/tags.yaml
+            mode: "0755"
+            state: touch
+
+        - name: Linux | Add tags to file
+          ansible.builtin.lineinfile:
+            line: "{{ item }}"
+            path: /etc/insights-client/tags.yaml
+          loop: "{{ insights_tags }}"
+
+    - name: Linux | Configure short name if OCP VM
+      ansible.builtin.lineinfile:
+        line: "display_name={{ hostvars[inventory_hostname].ansible_fqdn }}"
+        regexp: "^#display_name"
+        path: /etc/insights-client/insights-client.conf
+      when:
+        - is_ocp_vm is defined
+        - is_ocp_vm
+
+    - name: Linux | Ensure host is registered
+      redhatinsights.insights.insights_register:
+        state: present
+        force_reregister: true
+        display_name: "{{ hostvars[inventory_hostname].ansible_fqdn | default(omit, true) }}"

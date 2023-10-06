@@ -1,0 +1,39 @@
+---
+- name: Linux | Install and configure Performance Co-Pilot
+  hosts: "{{ target_hosts | default('rhel_demo_servers', true) }}"
+  become: true
+  tasks:
+    - name: Linux | Download and extract node-exporter binary
+      ansible.builtin.unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+        dest: /usr/bin
+        remote_src: true
+        extra_opts:
+          - "--strip=1"
+        mode: "0755"
+
+    - name: Linux hosts | Ensure systemd unit is created
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=Prometheus Metrics Exporter
+          After=network.target
+          StartLimitIntervalSec=0
+
+          [Service]
+          Type=simple
+          Restart=always
+          RestartSec=1
+          User=root
+          ExecStart=/usr/bin/node_exporter
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/node_exporter.service
+        mode: "0755"
+
+    - name: Linux hosts | Enable node-exporter service
+      ansible.builtin.service:
+        name: node_exporter.service
+        state: started
+        enabled: true

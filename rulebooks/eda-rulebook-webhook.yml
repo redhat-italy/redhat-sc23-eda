@@ -1,0 +1,34 @@
+---
+- name: EDA | Webhook | Listen for events on a webhook
+  hosts: localhost
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+  rules:
+    - name: EDA | Webhook | OCPVirt VM Provisioning
+      condition: event.payload.source == 'ocpvirt'
+      actions:
+        - debug:
+        - run_job_template:
+            name: "[EDA][Linux] Register RH VM"
+            organization: Default
+            job_args:
+              extra_vars:
+                target_hosts: "{{ event.payload.instanceName }}"
+        - run_job_template:
+            name: "[EDA][Linux] Configure node-exporter on VM"
+            organization: Default
+            job_args:
+              extra_vars:
+                target_hosts: "{{ event.payload.instanceName }}"
+        - run_job_template:
+            name: "[EDA][Linux] Configure system with Insights"
+            organization: Default
+            job_args:
+              extra_vars:
+                target_hosts: "{{ event.payload.instanceName }}"
+                is_ocp_vm: true
+                insights_tags:
+                  - "group: ocpvirt"

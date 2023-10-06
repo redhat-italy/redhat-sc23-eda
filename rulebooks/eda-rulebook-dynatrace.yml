@@ -1,0 +1,31 @@
+- name: Dynatrace | Listen and react to events
+  hosts: all
+  sources:
+    - dynatrace.event_driven_ansible.dt_esa_api:
+        dt_api_host: "{{ dynatrace_api_url }}"
+        dt_api_token: "{{ dynatrace_api_token }}"
+        delay: 60
+  rules:
+    - name: Dynatrace | CPU Utilization problem handler
+      condition: event.displayId is defined and event.status == "OPEN" and event.title == "CPU saturation"
+      actions:
+        - debug:
+        - run_job_template:
+            name: "[EDA][Dynatrace] Open SNOW incident for problem"
+            organization: Default
+            job_args:
+              extra_vars:
+                dynatrace_problem_impact_level: "{{ event.impactLevel }}"
+                dynatrace_affected_host: "{{ event.impactedEntities[0].name }}"
+                dynatrace_problem_id: "{{ event.displayId }}"
+                dynatrace_problem_root_cause: "{{ event.rootCauseEntity }}"
+                dynatrace_problem_status: "{{ event.status }}"
+                dynatrace_problem_title: "{{ event.title }}"
+        - run_job_template:
+            name: "[EDA][Dynatrace] Resolve CPU Saturation issue on VM"
+            organization: Default
+            job_args:
+              extra_vars:
+                dynatrace_affected_host: "{{ event.impactedEntities[0].name }}"
+                dynatrace_problem_id: "{{ event.displayId }}"
+                dynatrace_problem_title: "{{ event.title }}"

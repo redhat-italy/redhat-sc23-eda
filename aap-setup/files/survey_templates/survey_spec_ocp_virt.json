@@ -1,0 +1,63 @@
+{
+  "description": "OCP Virt survey",
+  "name": "OCP Virt survey",
+  "spec": [
+    {
+      "question_name": "VM name",
+      "question_description": "Hostname for your VM",
+      "required": true,
+      "type": "text",
+      "variable": "ocp_vm_name",
+      "index": 0,
+      "default": "rhel9-vm"
+    },
+    {
+      "question_name": "VM Namespace",
+      "question_description": "Namespace for your VM",
+      "required": true,
+      "type": "text",
+      "variable": "ocp_vm_namespace",
+      "index": 1,
+      "default": "demo-vm"
+    },
+    {
+      "question_name": "VM Template to use",
+      "question_description": "VM template to use",
+      "type": "multiplechoice",
+      "min": 0,
+      "max": 1024,
+      "choices": ["rhel9-server", "windows2k19-server"],
+      "required": true,
+      "variable": "ocp_vm_template",
+      "index": 2,
+      "default": "rhel9-server"
+    },
+    {
+      "question_name": "CPU count for VM",
+      "question_description": "CPU count for VM",
+      "required": true,
+      "type": "integer",
+      "variable": "ocp_vm_cpu",
+      "index": 3,
+      "default": 2
+    },
+    {
+      "question_name": "Memory amount count for VM",
+      "question_description": "Memory amount count for VM",
+      "required": true,
+      "type": "text",
+      "variable": "ocp_vm_mem",
+      "index": 4,
+      "default": "4Gi"
+    },
+    {
+      "question_name": "Provisioning Webhook URL",
+      "question_description": "URL for provisioning webhook - EDA",
+      "required": true,
+      "type": "text",
+      "variable": "ocp_webhook_url",
+      "index": 5,
+      "default": "http://eda.rh-lab.labs:5000/endpoint"
+    }
+  ]
+}

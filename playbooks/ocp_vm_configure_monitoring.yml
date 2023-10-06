@@ -1,0 +1,90 @@
+- name: OCP | Configure monitoring and alerting for VM
+  hosts: localhost
+  module_defaults:
+    group/redhat.openshift.openshift:
+      host: "{{ ocp_api_url | default(lookup('env', 'K8S_AUTH_HOST'), true) }}"
+      username: "{{ ocp_admin_username | default(lookup('env', 'K8S_AUTH_USERNAME'), true) }}"
+      password: "{{ ocp_admin_password | default(lookup('env', 'K8S_AUTH_PASSWORD'), true) }}"
+      validate_certs: "{{ ocp_api_verify_tls | default(false, true) }}"
+  vars:
+    vm_name: "{{ ocp_vm_name | default('rhel9-vm', true) }}"
+    vm_namespace: "{{ ocp_vm_namespace | default('demo-vm', true) }}"
+
+  tasks:
+    - name: OCP | Login to OCP cluster
+      block:
+        - name: OCP | Login into OpenShift Container Platform cluster
+          redhat.openshift.openshift_auth:
+          register: _openshift_auth_results
+
+        - name: Retrieving OCP api_key
+          ansible.builtin.set_fact:
+            ocp_api_key: "{{ _openshift_auth_results.openshift_auth.api_key }}"
+
+    - name: OCP | Create the ServiceMonitor for the VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        definition:
+          kind: Service
+          apiVersion: v1
+          metadata:
+            name: "{{ vm_name | replace('.', '-') }}-metrics"
+            labels:
+              servicetype: "{{ vm_name | replace('.', '-') }}-metrics"
+          spec:
+            ports:
+              - name: metrics
+                protocol: TCP
+                port: 9100
+                targetPort: 9100
+            selector:
+              vm.kubevirt.io/name: "{{ vm_name }}"
+        wait: true
+        apply: true
+
+    - name: OCP | Create the Service for the VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        definition:
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+          metadata:
+            name: "{{ vm_name|  replace('.', '-') }}-metrics"
+          spec:
+            endpoints:
+              - interval: 30s
+                port: metrics
+                scheme: http
+            selector:
+              matchLabels:
+                servicetype: "{{ vm_name | replace('.', '-') }}-metrics"
+        wait: true
+        apply: true
+
+    - name: OCP | Create the PrometheusRule for the VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        definition:
+          apiVersion: monitoring.coreos.com/v1
+          kind: PrometheusRule
+          metadata:
+            labels:
+              test: ocpvirt
+            name: vm-low-disk
+          spec:
+            groups:
+              - name: ocpvirt.rules
+                rules:
+                  - alert: OCPVirtLowDisk
+                    expr: node_filesystem_avail_bytes{endpoint='metrics'} * on(instance) group_left(nodename) node_uname_info  < 50000
+                    for: 5m
+                    labels:
+                      severity: critical
+                      source: ocp
+                    annotations:
+                      message: !unsafe "Filesystem {{ $labels.device }} on {{ $labels.nodename }} is full"
+        wait: true
+        apply: true

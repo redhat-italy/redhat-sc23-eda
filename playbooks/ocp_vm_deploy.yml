@@ -1,0 +1,63 @@
+- name: OCP | Deploy VM from template
+  hosts: localhost
+  module_defaults:
+    group/redhat.openshift.openshift:
+      host: "{{ ocp_api_url | default(lookup('env', 'K8S_AUTH_HOST'), true) }}"
+      username: "{{ ocp_admin_username | default(lookup('env', 'K8S_AUTH_USERNAME'), true) }}"
+      password: "{{ ocp_admin_password | default(lookup('env', 'K8S_AUTH_PASSWORD'), true) }}"
+      validate_certs: "{{ ocp_api_verify_tls | default(false, true) }}"
+  vars:
+    vm_name: "{{ ocp_vm_name | default('rhel9-vm', true) }}"
+    vm_namespace: "{{ ocp_vm_namespace | default('demo-vm', true) }}"
+    vm_template: "{{ ocp_vm_template | default('rhel9-server', true) }}"
+    vm_cpu_count: "{{ ocp_vm_cpu | default(2, true)}}"
+    vm_mem_count: "{{ ocp_vm_mem | default('4Gi', true) }}"
+    vm_flavour: "{{ ocp_vm_flavour | default('RHEL', true) }}"
+  tasks:
+    - name: OCP | Set image source
+      ansible.builtin.set_fact:
+        vm_image_source: "{{ 'rhel9-base' if vm_template == 'rhel9-server' else 'win2k19-base' }}"
+    - name: OCP | Login to OCP cluster
+      block:
+        - name: OCP | Login into OpenShift Container Platform cluster
+          redhat.openshift.openshift_auth:
+          register: _openshift_auth_results
+
+        - name: Retrieving OCP api_key
+          ansible.builtin.set_fact:
+            ocp_api_key: "{{ _openshift_auth_results.openshift_auth.api_key }}"
+
+    - name: OCP | Process VM template
+      redhat.openshift.openshift_process:
+        api_key: "{{ ocp_api_key }}"
+        name: "{{ vm_template }}"
+        namespace: "{{ vm_namespace }}"
+        parameters:
+          NAME: "{{ vm_name }}"
+          WEBHOOK_URL: "{{ ocp_webhook_url }}"
+          SOURCE_URL: http://192.168.230.1/cloud_images/{{ vm_image_source }}.qcow2
+          VM_CPU: "{{ vm_cpu_count | int }}"
+          VM_RAM: "{{ vm_mem_count }}"
+        state: rendered
+      register: _rendered_template
+
+    - name: OCP | Create the rendered VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        definition: "{{ item }}"
+        wait: true
+        apply: true
+      loop: "{{ _rendered_template.resources }}"
+
+    - name: OCP | Start VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        name: "{{ vm_name }}"
+        api_version: kubevirt.io/v1
+        kind: VirtualMachine
+        merge_type: merge
+        definition:
+          spec:
+            running: true

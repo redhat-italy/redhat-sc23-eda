@@ -1,0 +1,9 @@
+---
+- name: EDA | Alertmanager | OCP | Remediate full filesystem
+  hosts: "{{ target_hosts | default('ocpvirt', true) }}"
+  become: true
+  tasks:
+    - name: EDA | Alertmanager | OCP | Fix full filesystem
+      ansible.builtin.file:
+        path: /myfilesystem/test
+        state: absent

@@ -1,0 +1,192 @@
+kind: "Template"
+apiVersion: "template.openshift.io/v1"
+metadata:
+  name: "rhel9-server"
+  namespace: "sc23-eda-demo"
+  labels:
+    app.kubernetes.io/part-of: "hyperconverged-cluster"
+    template.kubevirt.io/version: "v0.25.0"
+    app.kubernetes.io/version: 4.13.3
+    template.kubevirt.io/type: "vm"
+    vm.kubevirt.io/template: "rhel9-server-medium"
+    app.kubernetes.io/component: "templating"
+    app.kubernetes.io/ocp-by: "ssp-operator"
+    flavor.template.kubevirt.io/medium: "true"
+    os.template.kubevirt.io/rhel9.0: "true"
+    os.template.kubevirt.io/rhel9.1: "true"
+    app.kubernetes.io/name: "custom-templates"
+    os.template.kubevirt.io/rhel9.2: "true"
+    vm.kubevirt.io/template.namespace: "openshift"
+    workload.template.kubevirt.io/server: "true"
+  annotations:
+    template.kubevirt.io/provider: ""
+    template.kubevirt.io/provider-url: "https://www.redhat.com"
+    template.kubevirt.io/containerdisks: "registry.redhat.io/rhel9/rhel-guest-image\n"
+    template.kubevirt.io/version: "v1alpha1"
+    openshift.io/display-name: "Red Hat Enterprise Linux 9 VM"
+    openshift.io/documentation-url: "https://github.com/kubevirt/common-templates"
+    operator-sdk/primary-resource-type: "SSP.ssp.kubevirt.io"
+    defaults.template.kubevirt.io/disk: "rootdisk"
+    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.1: "Red Hat Enterprise Linux 9.0 or higher"
+    template.kubevirt.io/editable: "/objects[0].spec.template.spec.domain.cpu.sockets\n/objects[0].spec.template.spec.domain.cpu.cores\n/objects[0].spec.template.spec.domain.cpu.threads\n/objects[0].spec.template.spec.domain.resources.requests.memory\n/objects[0].spec.template.spec.domain.devices.disks\n/objects[0].spec.template.spec.volumes\n/objects[0].spec.template.spec.networks\n"
+    name.os.template.kubevirt.io/rhel9.2: "Red Hat Enterprise Linux 9.0 or higher"
+    template.openshift.io/bindable: "false"
+    operator-sdk/primary-resource: "openshift-cnv/ssp-kubevirt-hyperconverged"
+    tags: "hidden,kubevirt,virtualmachine,linux,rhel"
+    template.kubevirt.io/provider-support-level: "Full"
+    description: "Template for Red Hat Enterprise Linux 9 VM or newer. A PVC with the RHEL disk image must be available."
+    openshift.io/support-url: "https://github.com/kubevirt/common-templates/issues"
+    iconClass: "icon-rhel"
+    openshift.io/provider-display-name: ""
+objects:
+  - apiVersion: "kubevirt.io/v1"
+    kind: "VirtualMachine"
+    metadata:
+      annotations:
+        vm.kubevirt.io/validations: "[\n  {\n    \"name\": \"minimal-required-memory\",\n    \"path\": \"jsonpath::.spec.domain.resources.requests.memory\",\n    \"rule\": \"integer\",\n    \"message\": \"This VM requires more memory.\",\n    \"min\": 1610612736\n  }\n]\n"
+      labels:
+        app: "${NAME}"
+        vm.kubevirt.io/template: "rhel9-server"
+        vm.kubevirt.io/template.revision: "1"
+      name: "${NAME}"
+    spec:
+      dataVolumeTemplates:
+        - metadata:
+            name: "${NAME}"
+          spec:
+            storage:
+              resources:
+                requests:
+                  storage: "30Gi"
+            preallocation: false
+            source:
+              http:
+                url: "${SOURCE_URL}"
+        - metadata:
+            name: "${NAME}-additional-disk"
+          spec:
+            storage:
+              resources:
+                requests:
+                  storage: "5Gi"
+            preallocation: false
+            source:
+              blank: {}
+      running: false
+      template:
+        metadata:
+          annotations:
+            vm.kubevirt.io/flavor: "medium"
+            vm.kubevirt.io/os: "rhel9"
+            vm.kubevirt.io/workload: "server"
+          labels:
+            kubevirt.io/domain: "${NAME}"
+            kubevirt.io/size: "medium"
+        spec:
+          domain:
+            cpu:
+              cores: ${{VM_CPU}}
+              sockets: 1
+              threads: 1
+            devices:
+              disks:
+                - name: "rootdisk"
+                  disk:
+                    bus: "virtio"
+                  bootOrder: 1
+                - disk:
+                    bus: "virtio"
+                  name: "cloudinitdisk"
+                  bootOrder: 2
+                - name: "additional-disk"
+                  disk:
+                    bus: "virtio"
+              interfaces:
+                - masquerade: {}
+                  model: "virtio"
+                  name: "default"
+                - name: "bridged-network"
+                  model: "virtio"
+                  bridge: {}
+              networkInterfaceMultiqueue: true
+              rng: {}
+            features:
+              smm:
+                enabled: true
+            firmware:
+              bootloader:
+                efi: {}
+            machine:
+              type: "pc-q35-rhel9.2.0"
+            resources:
+              requests:
+                memory: ${VM_RAM}
+          evictionStrategy: "LiveMigrate"
+          networks:
+            - name: "default"
+              pod: {}
+            - name: "bridged-network"
+              multus:
+                networkName: "sc23-eda-demo/br1"
+          terminationGracePeriodSeconds: 180
+          volumes:
+            - dataVolume:
+                name: "${NAME}"
+              name: "rootdisk"
+            - name: "additional-disk"
+              dataVolume:
+                name: "${NAME}-additional-disk"
+            - name: "cloudinitdisk"
+              cloudInitNoCloud:
+                userData: |
+                  #cloud-config
+                  preserve_hostname: true
+                  ssh_pwauth: true
+                  user: sysadmin
+                  password: redhat
+                  chpasswd:
+                    expire: false
+                  users:
+                    - name: sysadmin
+                      plain_text_passwd: redhat
+                      lock_passwd: false
+                      sudo: ALL=(ALL) NOPASSWD:ALL
+                  disk_setup:
+                    /dev/vdc:
+                      table_type: 'mbr'
+                      layout: [100]
+                      overwrite: True
+                  fs_setup:
+                    - filesystem: 'ext4'
+                      device: '/dev/vdc1'
+                  write_files:
+                    - path: /tmp/send_webhook.sh
+                      content: |
+                        #!/bin/bash
+                        curl -X POST -d '{"source": "ocpvirt", "instanceName": "'$(hostname -f)'" }' ${WEBHOOK_URL}
+                      permissions: '0755'
+                  mounts:
+                    - [ /dev/vdc1, /myfilesystem ]
+                  runcmd:
+                    - hostnamectl set-hostname $(hostname -f)
+                    - /bin/bash /tmp/send_webhook.sh
+                    - systemctl restart NetworkManager
+
+parameters:
+  - name: "NAME"
+    description: "VM name"
+    generate: "expression"
+    from: "rhel9-vm"
+  - name: "WEBHOOK_URL"
+    description: "Webhook to call after provisioning"
+    value: http://YOUR_EDA_HOSTNAME:5000/endpoint
+  - name: "SOURCE_URL"
+    description: URL to fetch the QCOW image
+    value: URL_TO_QCOW_IMAGE
+  - name: "VM_CPU"
+    description: CPU Count for VM
+    value: "2"
+  - name: "VM_RAM"
+    description: Memory Count for VM
+    value: "4Gi"

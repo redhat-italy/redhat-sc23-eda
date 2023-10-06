@@ -1,0 +1,16 @@
+---
+- name: Dynatrace | Find and kill processes using more than 75% CPU
+  hosts: "{{ dynatrace_affected_host | default('rhel_demo_servers',true) }}"
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Dynatrace |Get processes using more than 40% CPU
+      ansible.builtin.shell: "ps aux --sort=-%cpu | awk '$3 > 40 {print $2}'"
+      register: high_cpu_pids
+      changed_when: false
+
+    - name: Dynatrace |Kill high CPU-consuming processes
+      ansible.builtin.shell: "kill -9 {{ item }}"
+      ignore_errors: true
+      loop: "{{ high_cpu_pids.stdout_lines }}"
+      when: high_cpu_pids.stdout_lines | length > 0

@@ -1,0 +1,10 @@
+---
+- name: Linux | RHEL Subscription attach
+  hosts: "{{ target_hosts | default('rhel_demo_servers', true) }}"
+  become: true
+  tasks:
+    - name: Linux | Register system with Red Hat Subscription Manager
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ rhsm_user }}"
+        password: "{{ rhsm_password }}"

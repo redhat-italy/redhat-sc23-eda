@@ -1,0 +1,51 @@
+- name: OCP | Destroy configured VM
+  hosts: localhost
+  module_defaults:
+    group/redhat.openshift.openshift:
+      host: "{{ ocp_api_url | default(lookup('env', 'K8S_AUTH_HOST'), true) }}"
+      username: "{{ ocp_admin_username | default(lookup('env', 'K8S_AUTH_USERNAME'), true) }}"
+      password: "{{ ocp_admin_password | default(lookup('env', 'K8S_AUTH_PASSWORD'), true) }}"
+      validate_certs: "{{ ocp_api_verify_tls | default(false, true) }}"
+  vars:
+    vm_name: "{{ ocp_vm_name | default('rhel9-vm', true) }}"
+    vm_namespace: "{{ ocp_vm_namespace | default('demo-vm', true) }}"
+
+  tasks:
+    - name: OCP | Login to OCP cluster
+      block:
+        - name: OCP | Login into OpenShift Container Platform cluster
+          redhat.openshift.openshift_auth:
+          register: _openshift_auth_results
+
+        - name: Retrieving OCP api_key
+          ansible.builtin.set_fact:
+            ocp_api_key: "{{ _openshift_auth_results.openshift_auth.api_key }}"
+
+    - name: OCP | Remove the ServiceMonitor for the VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        api_version: v1
+        kind: Service
+        name: "{{ vm_name }}-metrics"
+        wait: true
+        state: absent
+
+    - name: OCP | Remove the Service for the VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        name: "{{ vm_name }}-metrics"
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        wait: true
+        state: absent
+
+    - name: OCP | Remove the rendered VM
+      redhat.openshift.k8s:
+        api_key: "{{ ocp_api_key }}"
+        namespace: "{{ vm_namespace }}"
+        api_version: kubevirt.io/v1
+        kind: VirtualMachine
+        name: "{{ vm_name }}"
+        state: absent

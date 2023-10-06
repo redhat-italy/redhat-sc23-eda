@@ -1,0 +1,7 @@
+---
+- name: Playbook for configuring AAP2 Controller resources
+  hosts: localhost
+  vars_files:
+    - demo-setup-vars.yml
+  roles:
+    - role: role_aap_controller_setup

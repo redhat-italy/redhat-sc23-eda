@@ -1,0 +1,5 @@
+- name: Linux | Saturate CPU usage
+  hosts: "{{ target_hosts | default('rhel_demo_servers', true) }}"
+  tasks:
+    - name: Linux | Saturate CPU usage
+      ansible.builtin.shell: openssl speed -multi $(grep -ci processor /proc/cpuinfo)

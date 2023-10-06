@@ -1,0 +1,64 @@
+---
+- name: EDA | Alertmanager | OCP | Playbook reacting to AlertManager Event with ITSM ticket
+  hosts: localhost
+  tasks:
+    - name: Handle new firing alert
+      when: alertStatus == "firing"
+      block:
+        - name: EDA | Alertmanager | OCP | Debug message
+          ansible.builtin.debug:
+            msg:
+              - "The event {{ item.labels.alertname }} just triggered on {{ item.labels.nodename }}"
+              - "Alert body is: {{ item.annotations.message }}"
+          loop: "{{ alerts }}"
+
+        - name: EDA | Alertmanager | OCP | Open ITSM ticket to report incident
+          servicenow.itsm.incident:
+            instance:
+              host: "{{ snow_instance }}"
+              username: "{{ snow_username }}"
+              password: "{{ snow_password }}"
+            caller: "admin"
+            state: new
+            short_description: "Alert {{ item.labels.alertname }} on host {{ item.labels.nodename }}"
+            description: |
+              Filesystem {{ item.labels.device }} on {{ item.labels.nodename }} is almost full.
+              Extend it or add a new disk.
+          register: _incident
+          loop: "{{ alerts }}"
+
+        - name: EDA | Alertmanager | OCP | Retrieve incident number
+          ansible.builtin.set_fact:
+            incident_number: "{{ _incident.results[0].record.number }}"
+
+        - name: EDA | Alertmanager | OCP | Retrieve incident number
+          ansible.builtin.set_stats:
+            data:
+              incident_number: "{{ _incident.results[0].record.number }}"
+
+        - name: EDA | Alertmanager | OCP | Remediating issue to resolve the alert
+          ansible.builtin.debug:
+            msg: Trying to solve {{ item.labels.alertname }}
+          loop: "{{ alerts }}"
+
+    - name: EDA | Alertmanager | OCP | Notify resolution
+      when: alertStatus == "resolved"
+      block:
+        - name: EDA | Alertmanager | OCP | Close ticket
+          servicenow.itsm.incident:
+            instance:
+              host: "{{ snow_instance }}"
+              username: "{{ snow_username }}"
+              password: "{{ snow_password }}"
+            state: resolved
+            number: "{{ ticket_number }}"
+            close_code: "Solved (Permanently)"
+            close_notes: |
+              The alert was handled and solved using Ansible Event Driven Automation.
+              Closing the ticket.
+          loop: "{{ alerts }}"
+
+        - name: EDA | Alertmanager | OCP | Notify resolution
+          ansible.builtin.debug:
+            msg: "The event {{ item.labels.alertname }} was just resolved by Ansible Event Driven!"
+          loop: "{{ alerts }}"
