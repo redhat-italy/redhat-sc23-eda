@@ -194,7 +194,7 @@ aap2_inventory_sources:
 aap2_templates:
   ### EDA ###
   - aap2_template_name: "[EDA][Insights] Handle Advisories"
-    aap2_template_playbook: eda-playbooks/insights_advisory_handle.yml
+    aap2_template_playbook: playbooks/insights_advisory_handle.yml
     aap2_template_credentials:
       - AAP2 Demo - AAP2 Controller Credentials
       - AAP2 Demo - RHSM Credentials
@@ -204,14 +204,14 @@ aap2_templates:
     aap2_template_project: AAP2 Demo
     # ------------------------------------
   - aap2_template_name: "[EDA][Alertmanager][OCP] - Report OCPVirtLowDisk alert"
-    aap2_template_playbook: eda-playbooks/alertmanager_ocp_ocpvirtlowdisk_report.yml
+    aap2_template_playbook: playbooks/alertmanager_ocp_ocpvirtlowdisk_report.yml
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_ask_vars: true
     aap2_template_credentials: "AAP2 Demo - ServiceNow Credentials"
     aap2_template_project: AAP2 Demo
     # ------------------------------------
   - aap2_template_name: "[EDA][Alertmanager][OCP] - Resolve OCPVirtLowDisk alert"
-    aap2_template_playbook: eda-playbooks/alertmanager_ocp_ocpvirtlowdisk_fix.yml
+    aap2_template_playbook: playbooks/alertmanager_ocp_ocpvirtlowdisk_fix.yml
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_ask_vars: true
     aap2_template_credentials: "AAP2 Demo - Linux Credentials"
@@ -219,7 +219,7 @@ aap2_templates:
     # ------------------------------------
 
   - aap2_template_name: "[EDA][OCP] Deploy VM on OCP"
-    aap2_template_playbook: ocp-playbooks/ocp_vm_deploy.yml
+    aap2_template_playbook: playbooks/ocp_vm_deploy.yml
     aap2_template_credentials:
       - AAP2 Demo - OCP Credentials
     aap2_template_survey_spec: "{{ lookup('file', 'survey_templates/survey_spec_ocp_virt.json') }}"
@@ -228,14 +228,14 @@ aap2_templates:
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][OCP] VM - Configure monitoring"
-    aap2_template_playbook: ocp-playbooks/ocp_vm_configure_monitoring.yml
+    aap2_template_playbook: playbooks/ocp_vm_configure_monitoring.yml
     aap2_template_credentials:
       - AAP2 Demo - OCP Credentials
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][OCP] Destroy VM on OCP"
-    aap2_template_playbook: ocp-playbooks/ocp_vm_destroy.yml
+    aap2_template_playbook: playbooks/ocp_vm_destroy.yml
     aap2_template_credentials:
       - AAP2 Demo - OCP Credentials
     aap2_template_inventory: AAP2 Demo - SCM Inventory
@@ -243,7 +243,7 @@ aap2_templates:
   # ------------------------------------
 
   - aap2_template_name: "[EDA][Linux] Register RH VM"
-    aap2_template_playbook: linux-playbooks/linux_subscribe_system.yml
+    aap2_template_playbook: playbooks/linux_subscribe_system.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
       - "AAP2 Demo - Linux Credentials"
@@ -252,28 +252,28 @@ aap2_templates:
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure system with Insights"
-    aap2_template_playbook: linux-playbooks/linux_insights_configure.yml
+    aap2_template_playbook: playbooks/linux_insights_configure.yml
     aap2_template_credentials: "AAP2 Demo - Linux Credentials"
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_ask_vars: true
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure PCP on VM"
-    aap2_template_playbook: linux-playbooks/linux_configure_pcp.yml
+    aap2_template_playbook: playbooks/linux_configure_pcp.yml
     aap2_template_ask_vars: true
     aap2_template_credentials: "AAP2 Demo - Linux Credentials"
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure node-exporter on VM"
-    aap2_template_playbook: linux-playbooks/linux_configure_node_exporter.yml
+    aap2_template_playbook: playbooks/linux_configure_node_exporter.yml
     aap2_template_ask_vars: true
     aap2_template_credentials: "AAP2 Demo - Linux Credentials"
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Dynatrace] Open SNOW incident for problem"
-    aap2_template_playbook: eda-playbooks/dynatrace_report.yml
+    aap2_template_playbook: playbooks/dynatrace_report.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
       - AAP2 Demo - ServiceNow Credentials
@@ -281,14 +281,14 @@ aap2_templates:
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Dynatrace] Saturate VM CPU"
-    aap2_template_playbook: eda-playbooks/dynatrace_cpu_saturation_trigger.yml
+    aap2_template_playbook: playbooks/dynatrace_cpu_saturation_trigger.yml
     aap2_template_credentials:
       - AAP2 Demo - Linux Credentials
     aap2_template_inventory: AAP2 Demo - SCM Inventory
     aap2_template_project: AAP2 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Dynatrace] Resolve CPU Saturation issue on VM"
-    aap2_template_playbook: eda-playbooks/dynatrace_cpu_saturation_fix.yml
+    aap2_template_playbook: playbooks/dynatrace_cpu_saturation_fix.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
       - AAP2 Demo - Linux Credentials
