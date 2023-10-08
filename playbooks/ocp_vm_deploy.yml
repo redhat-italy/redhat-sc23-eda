@@ -35,7 +35,6 @@
         parameters:
           NAME: "{{ vm_name }}"
           WEBHOOK_URL: "{{ ocp_webhook_url }}"
-          SOURCE_URL: http://192.168.230.1/cloud_images/{{ vm_image_source }}.qcow2
           VM_CPU: "{{ vm_cpu_count | int }}"
           VM_RAM: "{{ vm_mem_count }}"
         state: rendered

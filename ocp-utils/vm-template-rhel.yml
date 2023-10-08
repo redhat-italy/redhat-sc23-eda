@@ -6,39 +6,24 @@ metadata:
   labels:
     app.kubernetes.io/part-of: "hyperconverged-cluster"
     template.kubevirt.io/version: "v0.25.0"
-    app.kubernetes.io/version: 4.13.3
+    app.kubernetes.io/version: 4.13.4
     template.kubevirt.io/type: "vm"
-    vm.kubevirt.io/template: "rhel9-server-medium"
     app.kubernetes.io/component: "templating"
     app.kubernetes.io/ocp-by: "ssp-operator"
-    flavor.template.kubevirt.io/medium: "true"
+    app.kubernetes.io/name: "custom-templates"
     os.template.kubevirt.io/rhel9.0: "true"
     os.template.kubevirt.io/rhel9.1: "true"
-    app.kubernetes.io/name: "custom-templates"
     os.template.kubevirt.io/rhel9.2: "true"
     vm.kubevirt.io/template.namespace: "openshift"
     workload.template.kubevirt.io/server: "true"
   annotations:
-    template.kubevirt.io/provider: ""
-    template.kubevirt.io/provider-url: "https://www.redhat.com"
-    template.kubevirt.io/containerdisks: "registry.redhat.io/rhel9/rhel-guest-image\n"
-    template.kubevirt.io/version: "v1alpha1"
-    openshift.io/display-name: "Red Hat Enterprise Linux 9 VM"
-    openshift.io/documentation-url: "https://github.com/kubevirt/common-templates"
-    operator-sdk/primary-resource-type: "SSP.ssp.kubevirt.io"
+    openshift.io/display-name: "Red Hat Summit Connect - RHEL9"
     defaults.template.kubevirt.io/disk: "rootdisk"
-    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
-    name.os.template.kubevirt.io/rhel9.1: "Red Hat Enterprise Linux 9.0 or higher"
-    template.kubevirt.io/editable: "/objects[0].spec.template.spec.domain.cpu.sockets\n/objects[0].spec.template.spec.domain.cpu.cores\n/objects[0].spec.template.spec.domain.cpu.threads\n/objects[0].spec.template.spec.domain.resources.requests.memory\n/objects[0].spec.template.spec.domain.devices.disks\n/objects[0].spec.template.spec.volumes\n/objects[0].spec.template.spec.networks\n"
-    name.os.template.kubevirt.io/rhel9.2: "Red Hat Enterprise Linux 9.0 or higher"
-    template.openshift.io/bindable: "false"
-    operator-sdk/primary-resource: "openshift-cnv/ssp-kubevirt-hyperconverged"
-    tags: "hidden,kubevirt,virtualmachine,linux,rhel"
-    template.kubevirt.io/provider-support-level: "Full"
     description: "Template for Red Hat Enterprise Linux 9 VM or newer. A PVC with the RHEL disk image must be available."
-    openshift.io/support-url: "https://github.com/kubevirt/common-templates/issues"
     iconClass: "icon-rhel"
     openshift.io/provider-display-name: ""
+    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
+
 objects:
   - apiVersion: "kubevirt.io/v1"
     kind: "VirtualMachine"
@@ -52,17 +37,19 @@ objects:
       name: "${NAME}"
     spec:
       dataVolumeTemplates:
-        - metadata:
-            name: "${NAME}"
+        - apiVersion: cdi.kubevirt.io/v1beta1
+          kind: DataVolume
+          metadata:
+            name: '${NAME}'
           spec:
+            sourceRef:
+              kind: DataSource
+              name: 'rhel9'
+              namespace: 'openshift-virtualization-os-images'
             storage:
               resources:
                 requests:
-                  storage: "30Gi"
-            preallocation: false
-            source:
-              http:
-                url: "${SOURCE_URL}"
+                  storage: 30Gi
         - metadata:
             name: "${NAME}-additional-disk"
           spec:
@@ -181,12 +168,9 @@ parameters:
   - name: "WEBHOOK_URL"
     description: "Webhook to call after provisioning"
     value: http://YOUR_EDA_HOSTNAME:5000/endpoint
-  - name: "SOURCE_URL"
-    description: URL to fetch the QCOW image
-    value: URL_TO_QCOW_IMAGE
   - name: "VM_CPU"
     description: CPU Count for VM
-    value: "2"
+    value: "4"
   - name: "VM_RAM"
     description: Memory Count for VM
     value: "4Gi"
