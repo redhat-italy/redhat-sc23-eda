@@ -23,6 +23,14 @@ metadata:
     iconClass: "icon-rhel"
     openshift.io/provider-display-name: ""
     name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
+    template.kubevirt.io/editable: |
+      /objects[0].spec.template.spec.domain.cpu.sockets
+      /objects[0].spec.template.spec.domain.cpu.cores
+      /objects[0].spec.template.spec.domain.cpu.threads
+      /objects[0].spec.template.spec.domain.resources.requests.memory
+      /objects[0].spec.template.spec.domain.devices.disks
+      /objects[0].spec.template.spec.volumes
+      /objects[0].spec.template.spec.networks
 
 objects:
   - apiVersion: "kubevirt.io/v1"
@@ -44,8 +52,8 @@ objects:
           spec:
             sourceRef:
               kind: DataSource
-              name: 'rhel9'
-              namespace: 'openshift-virtualization-os-images'
+              name: '${DATA_SOURCE_NAME}'
+              namespace: '${DATA_SOURCE_NAMESPACE}'
             storage:
               resources:
                 requests:
@@ -170,7 +178,13 @@ parameters:
     value: http://YOUR_EDA_HOSTNAME:5000/endpoint
   - name: "VM_CPU"
     description: CPU Count for VM
-    value: "4"
+    value: 4
   - name: "VM_RAM"
     description: Memory Count for VM
     value: "4Gi"
+  - name: DATA_SOURCE_NAME
+    description: Name of the DataSource to clone
+    value: rhel9
+  - name: DATA_SOURCE_NAMESPACE
+    description: Namespace of the DataSource
+    value: openshift-virtualization-os-images
