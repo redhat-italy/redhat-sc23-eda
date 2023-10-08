@@ -55,6 +55,9 @@ The automation that is triggered will take care of:
 
 ### Remediating an alert from OCP Virtualization VM with Service Now and EDA
 
+This use case will focus on automatic remediation of problems detected on a Virtual Machine deployed on Openshift virtualization.
+
+
 ## Configuration
 
 ## Requirements
