@@ -4,19 +4,23 @@ metadata:
   name: eda-alertmanager-receiver
   namespace: "sc23-eda-demo"
   labels:
-    alertmanagerConfig: exampeda-alertmanager-receiverle
+    alertmanagerConfig: eda-alertmanager-receiver
 spec:
   receivers:
     - name: EDA
       webhookConfigs:
         - url: "http://eda.rh-lab.labs:5001/endpoint"
   route:
-    groupBy: ['namespace']
+    groupBy: ["namespace"]
     groupInterval: 2m
     groupWait: 30s
     repeatInterval: 12h
-    receiver: 'EDA'
+    receiver: "EDA"
     routes:
       - receiver: EDA
         match:
           source: ocp
+    matchers:
+      - matchType: =
+        name: source
+        value: ocp

@@ -47,7 +47,7 @@
         definition: "{{ item }}"
         wait: true
         apply: true
-      loop: "{{ _rendered_template.resources }}"
+      loop: "{{ _rendered_template.resources | replace('********', 'openshift') }}"
 
     - name: OCP | Start VM
       redhat.openshift.k8s:
