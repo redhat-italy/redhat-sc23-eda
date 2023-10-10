@@ -17,5 +17,6 @@ openshift_admin_password:
 rhsm_account_username:
 rhsm_account_password:
 
-dynatrace_url:
-dynatrace_token:
+kafka_host:
+kafka_port:
+kafka_topic:

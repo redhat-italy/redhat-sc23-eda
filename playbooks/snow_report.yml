@@ -1,0 +1,20 @@
+- name: ServiceNow | Track issues and anomalies
+  hosts: localhost
+  tasks:
+    - name: ServiceNow | Raise SNOW request to report
+      servicenow.itsm.incident:
+        instance:
+          host: "{{ snow_instance }}"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        caller: "admin"
+        state: new
+        impact: high
+        urgency: critical
+        short_description: "{{ incident_short_description }}"
+        description: "{{ incident_description }}"
+      register: _incident
+
+    - name: Insights | Report Incident creation
+      ansible.builtin.debug:
+        msg: "Incident {{ _incident.record.number }} created"

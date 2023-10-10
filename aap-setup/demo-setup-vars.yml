@@ -1,27 +1,35 @@
 aap2_insights_credentials:
-  - name: AAP2 Demo - Insights Credentials
+  - name: SC23 Demo - Insights Credentials
     insights_username: "{{ rhsm_account_username }}"
     insights_password: "{{ rhsm_account_password }}"
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_projects:
-  - name: "AAP2 Demo"
+  - name: "SC23 Demo"
     scm_url: "https://github.com/redhat-italy/redhat-sc23-eda.git"
-    scm_credential: "AAP2 Demo - GIT Credentials"
+    scm_credential: "SC23 Demo - GIT Credentials"
     scm_branch: "master"
+  # ------------------------------------
+  # ------------------------------------
 
-  - name: "AAP2 Demo - Insights"
+  - name: "SC23 Demo - Insights"
     scm_url: "https://cloud.redhat.com"
-    scm_credential: "AAP2 Demo - Insights Credentials"
+    scm_credential: "SC23 Demo - Insights Credentials"
     scm_type: "insights"
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_machine_credentials:
-  - name: AAP2 Demo - Linux Credentials
+  - name: SC23 Demo - Linux Credentials
     username: sysadmin
     password: redhat
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_custom_credentials:
-  - credential_type: AAP2 Demo - ServiceNow Auth
-    name: AAP2 Demo - ServiceNow Credentials
+  - credential_type: SC23 Demo - ServiceNow Auth
+    name: SC23 Demo - ServiceNow Credentials
     credential_type_inputs:
       fields:
         - id: snow_url
@@ -50,8 +58,8 @@ aap2_custom_credentials:
       snow_user: "{{ servicenow_instance_username }}"
       snow_pwd: "{{ servicenow_instance_password }}"
   # ------------------------------------
-  - credential_type: AAP2 Demo - OCP Auth
-    name: AAP2 Demo - OCP Credentials
+  - credential_type: SC23 Demo - OCP Auth
+    name: SC23 Demo - OCP Credentials
     credential_type_inputs:
       fields:
         - id: ocp_admin_username
@@ -80,8 +88,8 @@ aap2_custom_credentials:
       ocp_admin_username: "{{ openshift_admin_username }}"
       ocp_admin_password: "{{ openshift_admin_password }}"
   # ------------------------------------
-  - credential_type: AAP2 Demo - RHSM Auth
-    name: AAP2 Demo - RHSM Credentials
+  - credential_type: SC23 Demo - RHSM Auth
+    name: SC23 Demo - RHSM Credentials
     credential_type_inputs:
       fields:
         - id: rhsm_user
@@ -106,31 +114,7 @@ aap2_custom_credentials:
       rhsm_user: "{{ rhsm_account_username }}"
       rhsm_password: "{{ rhsm_account_password }}"
   # ------------------------------------
-  - credential_type: AAP2 Demo - Dynatrace Auth
-    name: AAP2 Demo - Dynatrace Credentials
-    credential_type_inputs:
-      fields:
-        - id: dynatrace_api_url
-          type: string
-          label: Dynatrace API URL
-          secret: false
-        - id: dynatrace_api_token
-          type: string
-          label: Dynatrace API Token
-          secret: true
-      required:
-        - dynatrace_api_url
-        - dynatrace_api_token
-    credential_type_injectors:
-      extra_vars:
-        dynatrace_api_url: !unsafe "{{ dynatrace_api_url }}"
-        dynatrace_api_token: !unsafe "{{ dynatrace_api_token }}"
-    credential_inputs:
-      dynatrace_api_url: "{{ dynatrace_url }}"
-      dynatrace_api_token: "{{ dynatrace_token }}"
-  # ------------------------------------
-
-  - credential_type: AAP2 Demo - Controller Auth
+  - credential_type: SC23 Demo - Controller Auth
     credential_type_inputs:
       fields:
         - id: aap2_url
@@ -154,29 +138,33 @@ aap2_custom_credentials:
         CONTROLLER_HOST: !unsafe "{{ aap2_url }}"
         CONTROLLER_USERNAME: !unsafe "{{ aap2_user }}"
         CONTROLLER_PASSWORD: !unsafe "{{ aap2_pwd }}"
-    name: AAP2 Demo - AAP2 Controller Credentials
+    name: SC23 Demo - AAP2 Controller Credentials
     credential_inputs:
       aap2_url: "{{ aap2_controller_url }}"
       aap2_user: "{{ aap2_controller_username }}"
       aap2_pwd: "{{ aap2_controller_password }}"
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_inventories:
-  - aap2_inventory_name: AAP2 Demo - Insights Inventory
+  - aap2_inventory_name: SC23 Demo - Insights Inventory
   # ------------------------------------
-  - aap2_inventory_name: AAP2 Demo - SCM Inventory
+  - aap2_inventory_name: SC23 Demo - SCM Inventory
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_inventory_sources:
-  - aap2_inventory_source_name: AAP2 Demo - SCM Inventory Source
-    aap2_inventory_source_inventory: AAP2 Demo - SCM Inventory
+  - aap2_inventory_source_name: SC23 Demo - SCM Inventory Source
+    aap2_inventory_source_inventory: SC23 Demo - SCM Inventory
     aap2_inventory_source_type: scm
-    aap2_inventory_source_project: "AAP2 Demo"
-    aap2_inventory_source_credential: "AAP2 Demo - GIT Credentials"
+    aap2_inventory_source_project: "SC23 Demo"
+    aap2_inventory_source_credential: "SC23 Demo - GIT Credentials"
     aap2_inventory_source_path: inventory
   # ------------------------------------
-  - aap2_inventory_source_name: AAP2 Demo - Insights source
-    aap2_inventory_source_inventory: AAP2 Demo - Insights Inventory
+  - aap2_inventory_source_name: SC23 Demo - Insights source
+    aap2_inventory_source_inventory: SC23 Demo - Insights Inventory
     aap2_inventory_source_type: insights
-    aap2_inventory_source_credential: "AAP2 Demo - Insights Credentials"
+    aap2_inventory_source_credential: "SC23 Demo - Insights Credentials"
     aap2_inventory_source_vars:
       get_patches: true
       get_tags: true
@@ -190,115 +178,116 @@ aap2_inventory_sources:
       keyed_groups:
         - key: insights_tags['insights-client']['group']
           separator: ""
+  # ------------------------------------
+  # ------------------------------------
 
 aap2_templates:
   ### EDA ###
   - aap2_template_name: "[EDA][Insights] Handle Advisories"
     aap2_template_playbook: playbooks/insights_advisory_handle.yml
     aap2_template_credentials:
-      - AAP2 Demo - AAP2 Controller Credentials
-      - AAP2 Demo - RHSM Credentials
-      - AAP2 Demo - Linux Credentials
-    aap2_template_inventory: AAP2 Demo - Insights Inventory
+      - SC23 Demo - AAP2 Controller Credentials
+      - SC23 Demo - RHSM Credentials
+      - SC23 Demo - Linux Credentials
+    aap2_template_inventory: SC23 Demo - Insights Inventory
     aap2_template_ask_vars: true
-    aap2_template_project: AAP2 Demo
+    aap2_template_project: SC23 Demo
     # ------------------------------------
   - aap2_template_name: "[EDA][Alertmanager][OCP] - Report OCPVirtLowDisk alert"
     aap2_template_playbook: playbooks/alertmanager_ocp_ocpvirtlowdisk_report.yml
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
+    aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_ask_vars: true
-    aap2_template_credentials: "AAP2 Demo - ServiceNow Credentials"
-    aap2_template_project: AAP2 Demo
+    aap2_template_credentials: "SC23 Demo - ServiceNow Credentials"
+    aap2_template_project: SC23 Demo
     # ------------------------------------
   - aap2_template_name: "[EDA][Alertmanager][OCP] - Resolve OCPVirtLowDisk alert"
     aap2_template_playbook: playbooks/alertmanager_ocp_ocpvirtlowdisk_fix.yml
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
+    aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_ask_vars: true
-    aap2_template_credentials: "AAP2 Demo - Linux Credentials"
-    aap2_template_project: AAP2 Demo
+    aap2_template_credentials: "SC23 Demo - Linux Credentials"
+    aap2_template_project: SC23 Demo
     # ------------------------------------
+  # ------------------------------------
 
   - aap2_template_name: "[EDA][OCP] Deploy VM on OCP"
     aap2_template_playbook: playbooks/ocp_vm_deploy.yml
     aap2_template_credentials:
-      - AAP2 Demo - OCP Credentials
+      - SC23 Demo - OCP Credentials
     aap2_template_survey_spec: "{{ lookup('file', 'survey_templates/survey_spec_ocp_virt.json') }}"
     aap2_template_survey_enabled: true
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][OCP] VM - Configure monitoring"
     aap2_template_playbook: playbooks/ocp_vm_configure_monitoring.yml
     aap2_template_credentials:
-      - AAP2 Demo - OCP Credentials
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+      - SC23 Demo - OCP Credentials
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][OCP] Destroy VM on OCP"
     aap2_template_playbook: playbooks/ocp_vm_destroy.yml
     aap2_template_credentials:
-      - AAP2 Demo - OCP Credentials
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+      - SC23 Demo - OCP Credentials
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
+  # ------------------------------------
   # ------------------------------------
 
   - aap2_template_name: "[EDA][Linux] Register RH VM"
     aap2_template_playbook: playbooks/linux_subscribe_system.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
-      - "AAP2 Demo - Linux Credentials"
-      - "AAP2 Demo - RHSM Credentials"
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+      - "SC23 Demo - Linux Credentials"
+      - "SC23 Demo - RHSM Credentials"
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure system with Insights"
     aap2_template_playbook: playbooks/linux_insights_configure.yml
-    aap2_template_credentials: "AAP2 Demo - Linux Credentials"
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
+    aap2_template_credentials: "SC23 Demo - Linux Credentials"
+    aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_ask_vars: true
-    aap2_template_project: AAP2 Demo
+    aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure PCP on VM"
     aap2_template_playbook: playbooks/linux_configure_pcp.yml
     aap2_template_ask_vars: true
-    aap2_template_credentials: "AAP2 Demo - Linux Credentials"
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+    aap2_template_credentials: "SC23 Demo - Linux Credentials"
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure node-exporter on VM"
     aap2_template_playbook: playbooks/linux_configure_node_exporter.yml
     aap2_template_ask_vars: true
-    aap2_template_credentials: "AAP2 Demo - Linux Credentials"
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+    aap2_template_credentials: "SC23 Demo - Linux Credentials"
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
-  - aap2_template_name: "[EDA][Dynatrace] Open SNOW incident for problem"
-    aap2_template_playbook: playbooks/dynatrace_report.yml
+  # ------------------------------------
+
+  # ------------------------------------
+  - aap2_template_name: "[EDA][Kafka] Shutdown Engine"
+    aap2_template_playbook: playbooks/kafka_shutdown_engine.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
-      - AAP2 Demo - ServiceNow Credentials
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+      - SC23 Demo - Linux Credentials
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
   # ------------------------------------
-  - aap2_template_name: "[EDA][Dynatrace] Saturate VM CPU"
-    aap2_template_playbook: playbooks/dynatrace_cpu_saturation_trigger.yml
-    aap2_template_credentials:
-      - AAP2 Demo - Linux Credentials
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
-  # ------------------------------------
-  - aap2_template_name: "[EDA][Dynatrace] Resolve CPU Saturation issue on VM"
-    aap2_template_playbook: playbooks/dynatrace_cpu_saturation_fix.yml
+  - aap2_template_name: "[EDA][Kafka] Report enginge shutdown with a ticket"
+    aap2_template_playbook: playbooks/snow_report.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
-      - AAP2 Demo - Linux Credentials
-    aap2_template_inventory: AAP2 Demo - SCM Inventory
-    aap2_template_project: AAP2 Demo
+      - SC23 Demo - ServiceNow Credentials
+    aap2_template_inventory: SC23 Demo - SCM Inventory
+    aap2_template_project: SC23 Demo
+  # ------------------------------------
   # ------------------------------------
 
 aap2_workflows:
   - aap2_workflow_name: "[EDA][OCP] Create VM and configure monitoring"
-    aap2_workflow_project: AAP2 Demo
+    aap2_workflow_project: SC23 Demo
     aap2_workflow_survey_spec: "{{ lookup('file', 'survey_templates/survey_spec_ocp_virt.json') }}"
     aap2_workflow_survey_enabled: true
     aap2_workflow_nodes:
@@ -311,7 +300,7 @@ aap2_workflows:
 
 ####### EDA CONTROLLER VARIABLES ########
 eda_projects:
-  - name: "EDA Demo Project"
+  - name: "SC23 Demo"
     git_url: https://github.com/redhat-italy/redhat-sc23-eda.git
     description: "Demo project to show EDA in action"
 eda_decision_envs:
@@ -321,18 +310,18 @@ eda_decision_envs:
 eda_activations:
   - name: eda-alertmanager
     rulebook: eda-rulebook-alertmanager.yml
-    project_name: "EDA Demo Project"
+    project_name: "SC23 Demo"
     decision_env: "kubealex-eda"
-  - name: eda-dynatrace
-    rulebook: eda-rulebook-dynatrace.yml
-    project_name: "EDA Demo Project"
+  - name: eda-kafka
+    rulebook: eda-rulebook-kafka.yml
+    project_name: "SC23 Demo"
     decision_env: "kubealex-eda"
-    extra_vars: "dynatrace_api_url: {{ dynatrace_api_url }}\ndynatrace_api_token: {{ dynatrace_api_token }}"
+    extra_vars: "kafka_host: {{ kafka_host }}\nkafka_port: {{ kafka_port }}\nkafka_topic: {{ kafka_topic }}"
   - name: eda-insights
     rulebook: eda-rulebook-insights.yml
-    project_name: "EDA Demo Project"
+    project_name: "SC23 Demo"
     decision_env: "kubealex-eda"
   - name: eda-webhook
     rulebook: eda-rulebook-webhook.yml
-    project_name: "EDA Demo Project"
+    project_name: "SC23 Demo"
     decision_env: "kubealex-eda"

@@ -1,0 +1,31 @@
+---
+- name: EDA | Kafka | Listen for events on a Kafka topic
+  hosts: localhost
+
+  sources:
+    - ansible.eda.kafka:
+        host: "{{ kafka_host }}"
+        port: "{{ kafka_port }}"
+        topic: "{{ kafka_topic }}"
+
+  rules:
+    - name: EDA | Kafka | Handle frequence anomaly
+      condition: event.body.XXXX
+      actions:
+        - debug:
+        - run_job_template:
+            name: "[EDA][Kafka] Shutdown Engine"
+            organization: Default
+            job_args:
+              extra_vars:
+                greeting: "{{ event.body.XXXX }}"
+
+        - run_job_template:
+            name: "[EDA][Kafka] Report enginge shutdown with a ticket"
+            organization: Default
+            job_args:
+              extra_vars:
+                incident_short_description: |
+                  "Anomaly reported"
+                incident_description: |
+                  "Anomaly reported"
