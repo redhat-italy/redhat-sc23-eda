@@ -1,0 +1,13 @@
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: sensors
+  labels:
+    strimzi.io/cluster: kafka-ephemeral-single
+  namespace: rh-sc23-eda-edge
+spec:
+  partitions: 1
+  replicas: 1
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
