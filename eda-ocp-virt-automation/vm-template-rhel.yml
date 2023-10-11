@@ -6,32 +6,37 @@ metadata:
   labels:
     app.kubernetes.io/part-of: "hyperconverged-cluster"
     template.kubevirt.io/version: "v0.25.0"
-    app.kubernetes.io/version: 4.13.4
+    app.kubernetes.io/version: 4.13.3
     template.kubevirt.io/type: "vm"
+    vm.kubevirt.io/template: "rhel9-server-medium"
     app.kubernetes.io/component: "templating"
     app.kubernetes.io/ocp-by: "ssp-operator"
-    app.kubernetes.io/name: "custom-templates"
-    os.template.kubevirt.io/rhel9.0: "true"
-    os.template.kubevirt.io/rhel9.1: "true"
+    flavor.template.kubevirt.io/medium: "true"
+g
     os.template.kubevirt.io/rhel9.2: "true"
     vm.kubevirt.io/template.namespace: "openshift"
     workload.template.kubevirt.io/server: "true"
   annotations:
-    openshift.io/display-name: "Red Hat Summit Connect - RHEL9"
+    template.kubevirt.io/provider: ""
+    template.kubevirt.io/provider-url: "https://www.redhat.com"
+    template.kubevirt.io/containerdisks: "registry.redhat.io/rhel9/rhel-guest-image\n"
+    template.kubevirt.io/version: "v1alpha1"
+    openshift.io/display-name: "Red Hat Enterprise Linux 9 VM"
+    openshift.io/documentation-url: "https://github.com/kubevirt/common-templates"
+    operator-sdk/primary-resource-type: "SSP.ssp.kubevirt.io"
     defaults.template.kubevirt.io/disk: "rootdisk"
+    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.1: "Red Hat Enterprise Linux 9.0 or higher"
+    template.kubevirt.io/editable: "/objects[0].spec.template.spec.domain.cpu.sockets\n/objects[0].spec.template.spec.domain.cpu.cores\n/objects[0].spec.template.spec.domain.cpu.threads\n/objects[0].spec.template.spec.domain.resources.requests.memory\n/objects[0].spec.template.spec.domain.devices.disks\n/objects[0].spec.template.spec.volumes\n/objects[0].spec.template.spec.networks\n"
+    name.os.template.kubevirt.io/rhel9.2: "Red Hat Enterprise Linux 9.0 or higher"
+    template.openshift.io/bindable: "false"
+    operator-sdk/primary-resource: "openshift-cnv/ssp-kubevirt-hyperconverged"
+    tags: "hidden,kubevirt,virtualmachine,linux,rhel"
+    template.kubevirt.io/provider-support-level: "Full"
     description: "Template for Red Hat Enterprise Linux 9 VM or newer. A PVC with the RHEL disk image must be available."
+    openshift.io/support-url: "https://github.com/kubevirt/common-templates/issues"
     iconClass: "icon-rhel"
     openshift.io/provider-display-name: ""
-    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
-    template.kubevirt.io/editable: |
-      /objects[0].spec.template.spec.domain.cpu.sockets
-      /objects[0].spec.template.spec.domain.cpu.cores
-      /objects[0].spec.template.spec.domain.cpu.threads
-      /objects[0].spec.template.spec.domain.resources.requests.memory
-      /objects[0].spec.template.spec.domain.devices.disks
-      /objects[0].spec.template.spec.volumes
-      /objects[0].spec.template.spec.networks
-
 objects:
   - apiVersion: "kubevirt.io/v1"
     kind: "VirtualMachine"
@@ -45,19 +50,17 @@ objects:
       name: "${NAME}"
     spec:
       dataVolumeTemplates:
-        - apiVersion: cdi.kubevirt.io/v1beta1
-          kind: DataVolume
-          metadata:
-            name: '${NAME}'
+        - metadata:
+            name: "${NAME}"
           spec:
-            sourceRef:
-              kind: DataSource
-              name: '${DATA_SOURCE_NAME}'
-              namespace: '${DATA_SOURCE_NAMESPACE}'
             storage:
               resources:
                 requests:
-                  storage: 30Gi
+                  storage: "30Gi"
+            preallocation: false
+            source:
+              http:
+                url: "${SOURCE_URL}"
         - metadata:
             name: "${NAME}-additional-disk"
           spec:
@@ -176,15 +179,12 @@ parameters:
   - name: "WEBHOOK_URL"
     description: "Webhook to call after provisioning"
     value: http://YOUR_EDA_HOSTNAME:5000/endpoint
+  - name: "SOURCE_URL"
+    description: URL to fetch the QCOW image
+    value: URL_TO_QCOW_IMAGE
   - name: "VM_CPU"
     description: CPU Count for VM
-    value: 4
+    value: "2"
   - name: "VM_RAM"
     description: Memory Count for VM
     value: "4Gi"
-  - name: DATA_SOURCE_NAME
-    description: Name of the DataSource to clone
-    value: rhel9
-  - name: DATA_SOURCE_NAMESPACE
-    description: Namespace of the DataSource
-    value: openshift-virtualization-os-images
