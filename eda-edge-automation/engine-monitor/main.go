@@ -54,8 +54,8 @@ func fakeSensorData(t time.Time) string {
 var engineOn bool
 
 type Message struct {
-	Status string `json:status`
-	Fail   bool   `json:fail`
+	Status string `json:"status"`
+	Fail   bool   `json:"fail"`
 }
 
 // engineShutDown is a dummy function to simulate a shutdown action
