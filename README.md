@@ -12,6 +12,9 @@ In this repository you will find the instructions and configuration to replicate
   - [Remediating an alert from OCP Virtualization VM with Service Now and EDA](#remediating-an-alert-from-ocp-virtualization-vm-with-service-now-and-eda)
     - [Trigger OCPVirtLowDisk Alert](#trigger-ocpvirtlowdisk-alert)
     - [Report the incident on ITSM and resolve it](#report-the-incident-on-itsm-and-resolve-it)
+  - [Edge device anomaly reaction](#edge-device-anomaly-reaction)
+    - [Anomaly detection](#anomaly-detection)
+    - [Reaction to the anomaly](#reaction-to-the-anomaly)
 - [Configuration](#configuration)
 - [Requirements](#requirements)
   - [Red Hat Openshift Container Platform](#red-hat-openshift-container-platform)
@@ -89,6 +92,21 @@ Once EDA has been notified, it will trigger a job template execution to report t
 
 For the sake of the use case, it is a simple resolution removing the file that caused the issue, but it can be extended using FS resizing, adding a disk, etc.
 
+### Edge device anomaly reaction
+
+The last use case focuses on the capability to react to a failure of a device based on the analysis of sensors' data streaming on a Kafka topic.
+The Event driven controller subscribes to the topic and checks the incoming data to take action in case of anomalies.
+
+#### Anomaly detection
+
+The controller device at the edge, deployed on Microshift sends the sensor information to a Kafka topic. As a result of an anomaly, the sensor data reveals an unexpected increase in the vibrations of the components of the controlled engine.
+
+A Kafka receiver, configure in Event Driven Automation Controller, is subscribed to the same topic and implements a logic that checks for vibration values over the threshold.
+
+#### Reaction to the anomaly
+
+When the threshold condition is met, the remediation phase starts, immediately shutting down the engine and raising an Incident to notify the fault, to then proceed with a manual inspection on the device itself.
+
 ## Configuration
 
 ## Requirements
@@ -113,7 +131,7 @@ You will need:
 
 The Virtual Machine expects a bridged network using an additional NIC on the Openshift nodes for DHCP and IP reachability from Ansible Controller.
 
-Example files are provided in the [ocp-utils/virt-bridged-network folder](./ocp-utils/virt-bridged-network/)
+Example files are provided in the [eda-ocp-virt-automation/ocp-virt-bridged-network folder](./eda-ocp-virt-automation/ocp-virt-bridged-network/)
 
 Ensure to adjust the name of the interface!
 
@@ -129,7 +147,7 @@ VM-related resources are created by the provisioning playbooks, but some additio
 - Configure monitoring for User Defined workloads
 - Create an AlertManager receiver for user workloads
 
-Configuration snippets can be found in the [ocp-utils/virt-monitoring folder](./ocp-utils/virt-monitoring/)
+Configuration snippets can be found in the [eda-ocp-virt-automation/ocp-monitoring folder](./eda-ocp-virt-automation/ocp-monitoring/)
 
 ### Red Hat Ansible Automation Platform
 
@@ -189,13 +207,14 @@ rhsm_account_password:
 
 # Dynatrace instance information
 
-dynatrace_url:
-dynatrace_token:
+kafka_host:
+kafka_port:
+kafka_topic:
 ```
 
 </details>
 
-When the variables are in place to run the configuration:
+When the variables are in place, to run the configuration:
 
 ```bash
 ansible-playbook -i aap-setup/inventory aap-setup/configure-aap.yml -e @config-variables.yml
