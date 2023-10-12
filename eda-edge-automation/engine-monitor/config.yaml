@@ -1,0 +1,7 @@
+---
+bootstrap-servers: "localhost:9092"
+#security-protocol: "sasl_ssl"
+#sasl-mechanisms: "PLAIN"
+#sasl-username: ""
+#sasl-password: ""
+topic: "sensors"
