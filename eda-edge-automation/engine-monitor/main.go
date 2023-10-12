@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -50,15 +51,32 @@ func fakeSensorData(t time.Time) string {
 	return fmt.Sprintf(`{"rpms": 5000, "volts": 5, "offset-vibration (mm/s)": %d}`, v)
 }
 
-var engineOn = true
+var engineOn bool
+
+type Message struct {
+	Status string `json:status`
+	Fail   bool   `json:fail`
+}
 
 // engineShutDown is a dummy function to simulate a shutdown action
 func engineShutdown(w http.ResponseWriter, r *http.Request) {
-	engineOn = false
-	log.Printf("Engine shutdown request from %v, User-Agent: %v\n", r.Host, r.UserAgent())
+	if r.Method == "POST" {
+
+		var m Message
+
+		json.NewDecoder(r.Body).Decode(&m)
+
+		if m.Status == "shutdown" {
+			engineOn = false
+			log.Printf("Engine shutdown request from %v, User-Agent: %v\n", r.Host, r.UserAgent())
+		}
+	} else {
+		log.Printf("Invalid request from %v, User-Agent: %v\n", r.Host, r.UserAgent())
+	}
 }
 
-func StartServer(port string) {
+// startServer starts the http server
+func startServer(port string) {
 	http.HandleFunc("/shutdown", engineShutdown)
 	http.ListenAndServe(":"+port, nil)
 }
@@ -66,6 +84,8 @@ func StartServer(port string) {
 func main() {
 
 	fmt.Println("Starting engine monitor simulator.")
+
+	engineOn = true
 
 	yamlConfigMap := flag.String("config", "", "Client YAML config file")
 	listenPort := flag.String("port", "8080", "Default listen port")
@@ -93,7 +113,7 @@ func main() {
 	var startTime = time.Now()
 
 	// Start web service to handle control actions as asynchronous goroutine
-	go StartServer(*listenPort)
+	go startServer(*listenPort)
 	log.Printf("Starting web service to handle control action")
 
 	// Create new Kafka producer
