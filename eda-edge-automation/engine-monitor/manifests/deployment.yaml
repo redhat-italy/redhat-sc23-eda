@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engine-monitor
+  labels:
+    app: engine-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: engine-monitor
+  template:
+    metadata:
+      labels:
+        app: engine-monitor
+    spec:
+      containers:
+      - name: engine-monitor
+        image: quay.io/gbsalinetti/engine-monitor:1.0
+        ports:
+        - containerPort: 8080
+        args:
+        - "-config config.yaml"
+        - "-port 8080"
+        - "-ttf 1m"
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "16Mi"
+
