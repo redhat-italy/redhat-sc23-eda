@@ -4,15 +4,16 @@
   tasks:
     - name: EDA | Kafka | Send shutdown signal
       ansible.builtin.uri:
-        url: "{{ endpoint }}"
+        url: "{{ engine_monitor_endpoint | default("engine-monitor.") }}/shutdown"
         method: POST
         status_code:
           - 200
           - 201
         body:
-
+          status: shutdown
         body_format: json
 
     - name: EDA | Kafka | Acknowledge shutdown
       ansible.builtin.debug:
-        msg: XXX
+        msg:
+          - "Engine shutdown successful"
