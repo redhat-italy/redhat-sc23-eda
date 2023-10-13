@@ -4,13 +4,13 @@
 
   sources:
     - ansible.eda.kafka:
-        host: "{{ kafka_host }}"
-        port: "{{ kafka_port }}"
-        topic: "{{ kafka_topic }}"
+        host: "{{ kafka_host | default('localhost', true) }}"
+        port: "{{ kafka_port | default('9092', true) }}"
+        topic: "{{ kafka_topic | default('sensors', true) }}"
 
   rules:
     - name: EDA | Kafka | Handle frequence anomaly
-      condition: event.body.XXXX
+      condition: event.body.offset-vibration >= 201
       actions:
         - debug:
         - run_job_template:
@@ -18,7 +18,7 @@
             organization: Default
             job_args:
               extra_vars:
-                greeting: "{{ event.body.XXXX }}"
+                vibration_rate: "{{ event.body.offset-vibration }}"
 
         - run_job_template:
             name: "[EDA][Kafka] Report enginge shutdown with a ticket"
@@ -26,6 +26,8 @@
             job_args:
               extra_vars:
                 incident_short_description: |
-                  "Anomaly reported"
+                  "Anomaly reported on Engine"
                 incident_description: |
-                  "Anomaly reported"
+                  Potential engine failure happening, anomaly on vibration rate.
+                  Reported vibration rate: "{{ event.body.offset-vibration }}
+                  Engine was shut down to avoid damage, requires an inspection ASAP.
