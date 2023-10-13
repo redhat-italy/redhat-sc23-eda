@@ -87,7 +87,7 @@ func main() {
 
 	engineOn = true
 
-	yamlConfigMap := flag.String("config", "", "Client YAML config file")
+	yamlConfigMap := flag.String("config", "config.yaml", "Client YAML config file")
 	listenPort := flag.String("port", "8080", "Default listen port")
 	flag.Parse()
 
@@ -99,6 +99,7 @@ func main() {
 	}
 
 	// Populate kafkaConfigMap
+	// To manage authetication mechanisms, uncomment the security.protocol and sasl fields
 	var engineMonConfig = kafka.ConfigMap{
 		"bootstrap.servers": cfg["bootstrap-servers"],
 		//"security.protocol": cfg["security-protocol"],
@@ -110,6 +111,7 @@ func main() {
 	// Define topic from config
 	var topic = cfg["topic"].(string)
 
+	// startTime is used to begin the
 	var startTime = time.Now()
 
 	// Start web service to handle control actions as asynchronous goroutine
@@ -145,7 +147,7 @@ func main() {
 		}
 	}()
 
-	// Loop producing events (CHANGEME)
+	// Produce events until engineOn is true
 	for engineOn == true {
 		value := fmt.Sprintf(fakeSensorData(startTime))
 

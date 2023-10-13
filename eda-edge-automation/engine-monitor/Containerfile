@@ -1,14 +1,18 @@
-FROM registry.redhat.io/rhel8/go-toolset:1.17.12-3.1661802325 as builder
+FROM registry.redhat.io/rhel9/go-toolset:1.19.10-14.1696536543 as builder
 
 WORKDIR /app
 USER root
 COPY main.go go.mod go.sum .
-COPY pkg ./pkg
 RUN go build .
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 COPY --from=builder /app/engine-monitor /
 
-CMD ["/engine-monitor", "-help"]
+RUN chgrp -R 0 /engine-monitor && \
+    chmod -R g+rwx /engine-monitor
+
+USER 1001
+
+ENTRYPOINT ["/engine-monitor"]
 

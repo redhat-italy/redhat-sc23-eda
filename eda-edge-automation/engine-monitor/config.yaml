@@ -1,7 +1,8 @@
 ---
+# Replace with k8s service name
 bootstrap-servers: "localhost:9092"
+topic: "sensors"
 #security-protocol: "sasl_ssl"
 #sasl-mechanisms: "PLAIN"
 #sasl-username: ""
 #sasl-password: ""
-topic: "sensors"
