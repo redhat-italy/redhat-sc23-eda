@@ -34,7 +34,7 @@ func loadConf(path string) (map[interface{}]interface{}, error) {
 }
 
 // fakeSensorData simulates the output of sensors attached to an engine
-func fakeSensorData(t time.Time) string {
+func fakeSensorData(t time.Time, ttf string) string {
 
 	vInRangeMin := 180
 	vInRangeMax := 200
@@ -44,7 +44,7 @@ func fakeSensorData(t time.Time) string {
 	// As of Go 1.20 there is no reason to call Seed with a random value
 	v := rand.Intn(vInRangeMax-vInRangeMin) + vInRangeMin
 
-	u, _ := time.ParseDuration("1m")
+	u, _ := time.ParseDuration(ttf)
 	if time.Since(t) > u {
 		v = rand.Intn(vOutRangeMax-vOutRangeMin) + vOutRangeMin
 	}
@@ -88,7 +88,8 @@ func main() {
 	engineOn = true
 
 	yamlConfigMap := flag.String("config", "config.yaml", "Client YAML config file")
-	listenPort := flag.String("port", "8080", "Default listen port")
+	listenPort := flag.String("port", "8080", "Default listen TCP port")
+	timeToFail := flag.String("ttf", "1m", "Time to fail. Examples: 1m, 60s, 1h")
 	flag.Parse()
 
 	// Load configuration from YAML
@@ -149,7 +150,7 @@ func main() {
 
 	// Produce events until engineOn is true
 	for engineOn == true {
-		value := fmt.Sprintf(fakeSensorData(startTime))
+		value := fmt.Sprintf(fakeSensorData(startTime, *timeToFail))
 
 		err := p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
