@@ -90,6 +90,7 @@ func main() {
 	yamlConfigMap := flag.String("config", "config.yaml", "Client YAML config file")
 	listenPort := flag.String("port", "8080", "Default listen TCP port")
 	timeToFail := flag.String("ttf", "1m", "Time to fail. Examples: 1m, 60s, 1h")
+	messageRate := flag.Int64("rate", 5, "Message rate in seconds. Examples: 2, 10")
 	flag.Parse()
 
 	// Load configuration from YAML
@@ -165,7 +166,7 @@ func main() {
 			}
 			log.Printf("Failed to produce message: %v\n", err)
 		}
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Duration(*messageRate) * time.Second)
 	}
 
 }

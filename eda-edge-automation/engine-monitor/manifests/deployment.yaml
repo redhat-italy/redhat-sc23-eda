@@ -30,7 +30,9 @@ spec:
           - '-port'
           - '8080'
           - '-ttf'
-          - 1m
+          - '1m'
+          - '-rate'
+          - '20'
         resources:
           limits:
             cpu: "200m"
