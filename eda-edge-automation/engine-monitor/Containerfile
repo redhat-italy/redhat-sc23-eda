@@ -7,12 +7,15 @@ RUN go build .
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal
 
-COPY --from=builder /app/engine-monitor /
+RUN mkdir /app
+COPY --from=builder /app/engine-monitor /app
 
-RUN chgrp -R 0 /engine-monitor && \
-    chmod -R g+rwx /engine-monitor
+RUN chgrp -R 0 /app && \
+    chmod -R g+rwx /app/engine-monitor
 
 USER 1001
 
-ENTRYPOINT ["/engine-monitor"]
+WORKDIR /app
+
+ENTRYPOINT ["./engine-monitor"]
 
