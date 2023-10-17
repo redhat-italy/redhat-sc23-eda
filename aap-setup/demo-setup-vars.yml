@@ -266,7 +266,7 @@ aap2_templates:
     aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_project: SC23 Demo
   # ------------------------------------
-  - aap2_template_name: "[EDA][Kafka] Report enginge shutdown with a ticket"
+  - aap2_template_name: "[EDA][Kafka] Report Engine shutdown with a ticket"
     aap2_template_playbook: playbooks/snow_report.yml
     aap2_template_ask_vars: true
     aap2_template_credentials:
