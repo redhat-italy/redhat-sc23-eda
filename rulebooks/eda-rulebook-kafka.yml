@@ -9,7 +9,7 @@
         topic: "{{ kafka_topic | default('sensors', true) }}"
 
   rules:
-    - name: EDA | Kafka | Handle frequence anomaly
+    - name: EDA | Kafka | Handle vibration anomaly
       condition: event.body.offset_vibration >= 201
       actions:
         - debug:
@@ -21,13 +21,13 @@
                 vibration_rate: "{{ event.body.offset_vibration }}"
 
         - run_job_template:
-            name: "[EDA][Kafka] Report enginge shutdown with a ticket"
+            name: "[EDA][Kafka] Report engine shutdown with a ticket"
             organization: Default
             job_args:
               extra_vars:
                 incident_short_description: |
-                  "Anomaly reported on Engine"
+                  Anomaly reported on Engine
                 incident_description: |
                   Potential engine failure happening, anomaly on vibration rate.
-                  Reported vibration rate: "{{ event.body.offset_vibration }}
+                  Reported vibration rate: {{ event.body.offset_vibration }}
                   Engine was shut down to avoid damage, requires an inspection ASAP.
