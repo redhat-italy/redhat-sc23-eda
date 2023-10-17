@@ -10,7 +10,7 @@
 
   rules:
     - name: EDA | Kafka | Handle frequence anomaly
-      condition: event.body.offset-vibration >= 201
+      condition: event.body.offset-vibration >= '201'
       actions:
         - debug:
         - run_job_template:
