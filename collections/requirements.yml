@@ -1,6 +1,7 @@
 ---
 collections:
-  - ansible.controller
+  - name: ansible.controller
+    source: https://console.redhat.com/api/automation-hub/content/published/
   - community.general
 roles:
   - name: role_aap_controller_setup
