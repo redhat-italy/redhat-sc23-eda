@@ -8,8 +8,7 @@ aap2_insights_credentials:
 aap2_projects:
   - name: "SC23 Demo"
     scm_url: "https://github.com/redhat-italy/redhat-sc23-eda.git"
-    scm_credential: "SC23 Demo - GIT Credentials"
-    scm_branch: "master"
+    scm_branch: "main"
   # ------------------------------------
   # ------------------------------------
 
@@ -158,7 +157,6 @@ aap2_inventory_sources:
     aap2_inventory_source_inventory: SC23 Demo - SCM Inventory
     aap2_inventory_source_type: scm
     aap2_inventory_source_project: "SC23 Demo"
-    aap2_inventory_source_credential: "SC23 Demo - GIT Credentials"
     aap2_inventory_source_path: inventory
   # ------------------------------------
   - aap2_inventory_source_name: SC23 Demo - Insights source
@@ -248,13 +246,6 @@ aap2_templates:
     aap2_template_credentials: "SC23 Demo - Linux Credentials"
     aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_ask_vars: true
-    aap2_template_project: SC23 Demo
-  # ------------------------------------
-  - aap2_template_name: "[EDA][Linux] Configure PCP on VM"
-    aap2_template_playbook: playbooks/linux_configure_pcp.yml
-    aap2_template_ask_vars: true
-    aap2_template_credentials: "SC23 Demo - Linux Credentials"
-    aap2_template_inventory: SC23 Demo - SCM Inventory
     aap2_template_project: SC23 Demo
   # ------------------------------------
   - aap2_template_name: "[EDA][Linux] Configure node-exporter on VM"
