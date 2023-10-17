@@ -48,7 +48,7 @@ func fakeSensorData(t time.Time, ttf string) string {
 	if time.Since(t) > u {
 		v = rand.Intn(vOutRangeMax-vOutRangeMin) + vOutRangeMin
 	}
-	return fmt.Sprintf(`{"rpms": 5000, "volts": 5, "offset-vibration": %d}`, v)
+	return fmt.Sprintf(`{"rpms": 5000, "volts": 5, "offset_vibration": %d}`, v)
 }
 
 var engineOn bool
