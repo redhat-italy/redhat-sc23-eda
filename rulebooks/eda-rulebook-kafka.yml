@@ -18,7 +18,7 @@
             organization: Default
             job_args:
               extra_vars:
-                vibration_rate: "{{ event.body.offset-vibration }}"
+                vibration_rate: "{{ event.body.offset_vibration }}"
 
         - run_job_template:
             name: "[EDA][Kafka] Report enginge shutdown with a ticket"
