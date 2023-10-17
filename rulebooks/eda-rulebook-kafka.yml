@@ -10,7 +10,7 @@
 
   rules:
     - name: EDA | Kafka | Handle frequence anomaly
-      condition: event.body.offset-vibration >= '201'
+      condition: event.body.offset_vibration >= '201'
       actions:
         - debug:
         - run_job_template:
@@ -29,5 +29,5 @@
                   "Anomaly reported on Engine"
                 incident_description: |
                   Potential engine failure happening, anomaly on vibration rate.
-                  Reported vibration rate: "{{ event.body.offset-vibration }}
+                  Reported vibration rate: "{{ event.body.offset_vibration }}
                   Engine was shut down to avoid damage, requires an inspection ASAP.
