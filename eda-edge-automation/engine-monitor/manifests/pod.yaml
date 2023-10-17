@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: engine-monitor
+  namespace: rh-sc23-eda-edge
+  labels:
+    app: engine-monitor
+spec:
+  volumes:
+    - name: config-volume
+      configMap:
+        name: engine-monitor
+        defaultMode: 420
+  containers:
+    - name: engine-monitor
+      image: quay.io/gbsalinetti/engine-monitor:1.0
+      ports:
+        - containerPort: 8080
+      args:
+        - "-config"
+        - /app/config/config.yaml
+        - "-port"
+        - "8080"
+        - "-ttf"
+        - 1m
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "128Mi"
+        requests:
+          cpu: "50m"
+          memory: "16Mi"
+      volumeMounts:
+        - name: config-volume
+          mountPath: /app/config

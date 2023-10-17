@@ -14,16 +14,17 @@
         controller_host: "{{ aap2_controller_url }}"
         controller_username: "{{ aap2_controller_username }}"
         controller_password: "{{ aap2_controller_password }}"
+        validate_certs: false
       register: _aap2_token
 
-    - name: EDA Controller | Project check
+    - name: EDA Controller | Create token on EDA Controller
       ansible.builtin.uri:
         url: "{{ eda_controller_url }}/api/eda/v1/users/me/awx-tokens/"
         force_basic_auth: true
         url_username: "{{ eda_controller_user }}"
         url_password: "{{ eda_controller_password }}"
         method: POST
-        body: 
+        body:
           name: "AAP Controller"
           description: "EDA Controller token"
           token: "{{ _aap2_token.ansible_facts.controller_token.token }}"

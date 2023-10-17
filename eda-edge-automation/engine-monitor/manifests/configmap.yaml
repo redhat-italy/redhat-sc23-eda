@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: engine-monitor
+  namespace: rh-sc23-eda-edge
 immutable: false
 data:
   config.yaml: |-
@@ -12,4 +13,3 @@ data:
     #sasl-mechanisms: "PLAIN"
     #sasl-username: ""
     #sasl-password: ""
-

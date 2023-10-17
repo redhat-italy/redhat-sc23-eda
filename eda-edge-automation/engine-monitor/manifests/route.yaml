@@ -2,9 +2,10 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: engine-monitor
+  namespace: rh-sc23-eda-edge
 spec:
   port:
-    targetPort: 8080 
+    targetPort: 8080
   to:
     kind: Service
     name: engine-monitor
