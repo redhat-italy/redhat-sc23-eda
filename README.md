@@ -205,7 +205,7 @@ openshift_admin_password:
 rhsm_account_username:
 rhsm_account_password:
 
-# Dynatrace instance information
+# Kafka instance information
 
 kafka_host:
 kafka_port:
